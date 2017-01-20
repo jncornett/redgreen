@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"log"
+	"os/exec"
+
+	"github.com/jncornett/redgreen"
 )
 
 const defaultAddr = "localhost:8080"
@@ -13,9 +16,15 @@ func main() {
 	)
 	flag.Parse()
 	args := flag.Args()
-	if len(args) < 1 {
-		log.Fatal("not enough arguments: must have key [command]...")
+	if len(args) < 2 {
+		log.Fatal("not enough arguments: must have key command [args]...")
 	}
-	_ := args[0]
-	_ := args[1:]
+	key := args[0]
+	cmd := exec.Command(args[1], args[2:]...)
+	err := cmd.Run()
+	rg := redgreen.RedGreenHTTPJSONClient(*addr)
+	rg.Put(redgreen.Entry{Key: key, Value: err == nil})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
