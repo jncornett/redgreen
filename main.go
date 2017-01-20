@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -29,6 +27,7 @@ func logRequestFunc(h http.HandlerFunc) http.HandlerFunc {
 }
 
 func cli(addr string, args []string) {
+	rg := RedGreenHTTPJSONClient(addr)
 	if len(args) < 1 {
 		log.Fatal("must have one of {put,get} for first arg in CLI mode")
 	}
@@ -45,70 +44,28 @@ func cli(addr string, args []string) {
 			log.Fatalln("value must be one of {true,false}, not", args[2])
 		}
 		e := Entry{Key: key, Value: value}
-		var b bytes.Buffer
-		json.NewEncoder(&b).Encode(e)
-		resp, err := http.Post(addr+"/api", "application/json; charset=utf-8", &b)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Print(resp)
+		rg.Put(e)
 	} else if cmd == "get" {
-		var (
-			resp *http.Response
-			err  error
-		)
 		if len(args) >= 2 {
-			resp, err = http.Get(addr + "/api/" + args[1])
+			fmt.Println(rg.Get(args[1]))
 		} else {
-			resp, err = http.Get(addr + "/api")
+			fmt.Println(rg.GetAll())
 		}
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(resp)
 	} else {
 		log.Fatal("must have one of {put,get} for first arg in CLI mode")
 	}
 }
 
 func serve(addr string) {
-	rg := NewRedGreen()
+	rg := NewRedGreenMaster()
 	defer rg.Close()
-	http.HandleFunc("/api", logRequestFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			json.NewEncoder(w).Encode(rg.GetAll())
-		} else if r.Method == "POST" {
-			var e Entry
-			err := json.NewDecoder(r.Body).Decode(&e)
-			if err != nil {
-				http.Error(w, err.Error(), 400)
-			}
-			rg.Put(e)
-		}
-	}))
-	http.Handle("/api/", http.StripPrefix("/api/", logRequestFunc(func(w http.ResponseWriter, r *http.Request) {
-		var e Entry
-		if r.Body == nil {
-			http.Error(w, "no request body", 400)
-			return
-		}
-		if r.Method != "GET" {
-			http.Error(w, fmt.Sprintln("invalid method:", r.Method), 400)
-			return
-		}
-		err := json.NewDecoder(r.Body).Decode(&e)
-		if err != nil {
-			http.Error(w, err.Error(), 400)
-		}
-		e = rg.Get(e.Key)
-		json.NewEncoder(w).Encode(e)
-	})))
-	http.Handle("/", http.FileServer(&assetfs.AssetFS{
+	http.Handle("/api", logRequest(http.StripPrefix("/api", NewRedGreenHTTPJSONServer(rg))))
+	http.Handle("/", logRequest(http.FileServer(&assetfs.AssetFS{
 		Asset:     Asset,
 		AssetDir:  AssetDir,
 		AssetInfo: AssetInfo,
 		Prefix:    "data/static",
-	}))
+	})))
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
@@ -122,7 +79,7 @@ func main() {
 		serve(*listenAddr)
 	} else {
 		if *listenAddr == defaultListenAddr {
-			*listenAddr = "http://" + "localhost" + defaultListenAddr
+			*listenAddr = "localhost" + defaultListenAddr
 		}
 		cli(*listenAddr, flag.Args())
 	}
