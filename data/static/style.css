@@ -1,0 +1,21 @@
+body {
+  background: black;
+}
+
+#app {
+  display: flex;
+  padding: 1em;
+}
+
+.entry {
+  display: block;
+  background-color: red;
+  border-radius: 5px;
+  color: #eee;
+  margin: 1em;
+  padding: 1em;
+}
+
+.entry.green {
+  background-color: green;
+}
