@@ -1,4 +1,4 @@
-package main
+package redgreen
 
 type Entry struct {
 	Key   string `json:"key"`

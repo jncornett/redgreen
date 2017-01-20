@@ -1,4 +1,4 @@
-package main
+package redgreen
 
 import (
 	"encoding/json"
