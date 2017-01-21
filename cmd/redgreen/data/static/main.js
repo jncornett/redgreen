@@ -3,7 +3,12 @@ $(function() {
   var Entry = Backbone.Model.extend({
     idAttribute: 'key',
     defaults: function() {
-      return {'key': '', 'value': false};
+        return {
+            'key': '',
+            'ok': false,
+            'data': [],
+            'updated': 0
+        };
     }
   });
 
@@ -24,7 +29,7 @@ $(function() {
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
       this.$el.addClass("entry");
-      this.$el.toggleClass("green", this.model.get("value"));
+      this.$el.toggleClass("green", this.model.get("ok"));
       return this;
     }
   });

@@ -1,87 +1,112 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"log"
-	"net/http"
+	"bufio"
+	"encoding/json"
+	"io"
+	"os"
 
-	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/jncornett/redgreen"
+	"github.com/urfave/cli"
 )
 
 //go:generate go-bindata data/...
 
 const (
-	defaultListenAddr = ":8080"
+	defaultListenAddr  = ":8080"
+	defaultConnectAddr = "localhost" + defaultListenAddr
+	apiEndpoint        = "/api"
 )
 
-func logRequest(h http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Method, r.URL)
-		h.ServeHTTP(w, r)
+var (
+	serverFlags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "addr",
+			Value: defaultListenAddr,
+			Usage: "address to listen to",
+		},
 	}
-}
-
-func logRequestFunc(h http.HandlerFunc) http.HandlerFunc {
-	return logRequest(h)
-}
-
-func cli(addr string, args []string) {
-	rg := redgreen.RedGreenHTTPJSONClient(addr)
-	if len(args) < 1 {
-		log.Fatal("must have one of {put,get} for first arg in CLI mode")
+	clientFlags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "addr",
+			Value: defaultConnectAddr,
+			Usage: "address to connect to",
+		},
 	}
-	cmd := args[0]
-	if cmd == "put" {
-		if len(args) < 3 {
-			log.Fatal("must specify put [key] [value], not enough args")
-		}
-		key := args[1]
-		var value bool
-		if args[2] == "true" {
-			value = true
-		} else if args[2] != "false" {
-			log.Fatalln("value must be one of {true,false}, not", args[2])
-		}
-		e := redgreen.Entry{Key: key, Value: value}
-		rg.Put(e)
-	} else if cmd == "get" {
-		if len(args) >= 2 {
-			fmt.Println(rg.Get(args[1]))
-		} else {
-			fmt.Println(rg.GetAll())
-		}
-	} else {
-		log.Fatal("must have one of {put,get} for first arg in CLI mode")
-	}
-}
-
-func serve(addr string) {
-	rg := redgreen.NewRedGreenMaster()
-	defer rg.Close()
-	http.Handle("/api", logRequest(http.StripPrefix("/api", redgreen.NewRedGreenHTTPJSONServer(rg))))
-	http.Handle("/", logRequest(http.FileServer(&assetfs.AssetFS{
-		Asset:     Asset,
-		AssetDir:  AssetDir,
-		AssetInfo: AssetInfo,
-		Prefix:    "data/static",
-	})))
-	log.Fatal(http.ListenAndServe(addr, nil))
-}
+)
 
 func main() {
-	var (
-		listenAddr = flag.String("listen", defaultListenAddr, "address to listen on")
-		doServe    = flag.Bool("serve", false, "toggle between client and server")
-	)
-	flag.Parse()
-	if *doServe {
-		serve(*listenAddr)
-	} else {
-		if *listenAddr == defaultListenAddr {
-			*listenAddr = "localhost" + defaultListenAddr
-		}
-		cli(*listenAddr, flag.Args())
+	app := cli.NewApp()
+	app.Commands = []cli.Command{
+		{
+			Name:    "serve",
+			Aliases: []string{"s"},
+			Usage:   "start a server",
+			Action:  doServe,
+			Flags:   serverFlags,
+		},
+		{
+			Name:    "run",
+			Aliases: []string{"r", "x"},
+			Usage:   "run a shell command",
+			Action:  doRun,
+			Flags: append([]cli.Flag{cli.BoolFlag{
+				Name:  "redir",
+				Usage: "tee STDERR to STDOUT",
+			}}, clientFlags...),
+		},
+		{
+			Name:     "put",
+			Aliases:  []string{"pu"},
+			Usage:    "insert an entry",
+			Action:   doPut,
+			Category: "op",
+			Flags:    clientFlags,
+		},
+		{
+			Name:     "get",
+			Aliases:  []string{"g"},
+			Usage:    "lookup an entry",
+			Action:   doGet,
+			Category: "op",
+			Flags:    clientFlags,
+		},
+		{
+			Name:     "pop",
+			Aliases:  []string{"po"},
+			Usage:    "lookup and delete an entry",
+			Action:   doPop,
+			Category: "op",
+			Flags:    clientFlags,
+		},
+		{
+			Name:     "getall",
+			Aliases:  []string{"ga"},
+			Usage:    "lookup all entries",
+			Action:   doGetAll,
+			Category: "op",
+			Flags:    clientFlags,
+		},
 	}
+	app.Run(os.Args)
+}
+
+func getClient(addr string) redgreen.HTTPJSONClient {
+	return redgreen.HTTPJSONClient("http://" + addr + apiEndpoint)
+}
+
+func printEntries(entries []redgreen.Entry) error {
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	return enc.Encode(entries)
+}
+
+func readAllLines(r io.Reader) (out []string, err error) {
+	s := bufio.NewScanner(r)
+	s.Split(bufio.ScanLines)
+	for s.Scan() {
+		out = append(out, s.Text())
+	}
+	err = s.Err()
+	return
 }
