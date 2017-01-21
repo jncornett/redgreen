@@ -7,15 +7,30 @@ body {
   padding: 1em;
 }
 
-.entry {
-  display: block;
-  background-color: red;
-  border-radius: 5px;
-  color: #eee;
-  margin: 1em;
-  padding: 1em;
+.redgreen-entry {
+    display: block;
+    margin: 1em;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
-.entry.green {
-  background-color: green;
+.redgreen-entry > .redgreen-header {
+    display: block;
+    padding: 1em;
+    color: #eee;
+    background-color: red;
+}
+
+.redgreen-entry.green > .redgreen-header {
+    background-color: green;
+}
+
+.redgreen-entry > .redgreen-metadata {
+    display: block;
+    padding: 1em;
+}
+
+.redgreen-entry > .redgreen-metadata > .redgreen-line {
+    display: block;
+    color: #eee;
 }

@@ -6,8 +6,8 @@ $(function() {
         return {
             'key': '',
             'ok': false,
-            'data': [],
-            'updated': 0
+            'data': null,
+            'updated': null
         };
     }
   });
@@ -24,13 +24,16 @@ $(function() {
     template: _.template($('#entry-template').html()),
     initialize: function() {
       this.listenTo(this.model, 'change', this.render);
-      this.listenTo(this.model, 'destroy', this.remove);
+      this.listenTo(this.model, 'remove', this.remove);
     },
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
-      this.$el.addClass("entry");
-      this.$el.toggleClass("green", this.model.get("ok"));
+      this.$el.toggleClass("green", this.model.get('ok'));
+      this.$el.addClass("redgreen-entry");
       return this;
+    },
+    debugRemove: function() {
+        console.log("debugRemove", this, arguments);
     }
   });
 
@@ -40,18 +43,17 @@ $(function() {
       this.listenTo(Entries, 'add', this.addOne);
       this.listenTo(Entries, 'reset', this.addAll);
       this.listenTo(Entries, 'all', this.render);
-      Entries.fetch();
+      Entries.fetch({reset: true});
     },
     addOne: function(entry) {
       var view = new EntryView({model: entry});
       this.$el.append(view.render().el);
-    },
-    addAll: function() {
-      Entries.each(this.addOne, this);
     }
   });
 
   var App = new AppView;
   // refresh the collection periodically
-  setInterval(function() { Entries.fetch(); }, 1000);
+  setInterval(function() {
+      Entries.fetch();
+  }, 1000);
 });

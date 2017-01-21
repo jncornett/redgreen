@@ -103,7 +103,12 @@ func (s HTTPJSONServer) handleGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s HTTPJSONServer) handleGetAll(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(s.store.GetAll())
+	entries := s.store.GetAll()
+	if entries == nil {
+		// to ensure that JSON encodes '[]' and not 'null'
+		entries = []Entry{}
+	}
+	json.NewEncoder(w).Encode(&entries)
 }
 
 func (s HTTPJSONServer) handlePut(w http.ResponseWriter, r *http.Request) {

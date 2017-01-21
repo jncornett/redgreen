@@ -8,7 +8,19 @@
     <body>
         <div id="app"></div>
         <script type="text/template" id="entry-template">
-            <span><%- key %></span>
+            <div class="redgreen-header">
+                <h2 class="redgreen-title"><%- key %></h2>
+                <span class="redgreen-tag"><%- updated %></span>
+            </div>
+            <% if (!ok) { %>
+                <div class="redgreen-metadata">
+                    <% _.forEach(data, function(line) { %>
+                        <span class="redgreen-line">
+                            <%- line %>
+                        </span>
+                    <% }) %>
+                </div>
+            <% } %>
         </script>
         <script src="thirdparty/jquery-3.1.1.min.js"></script>
         <script src="thirdparty/underscore-min.js"></script>
