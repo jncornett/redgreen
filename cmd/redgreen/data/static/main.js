@@ -9,6 +9,13 @@ $(function() {
             'data': null,
             'updated': null
         };
+    },
+    toObject: function() {
+      var obj = this.toJSON();
+      if (obj.updated) {
+        obj.updated = moment(obj.updated).fromNow();
+      }
+      return obj;
     }
   });
 
@@ -27,13 +34,10 @@ $(function() {
       this.listenTo(this.model, 'remove', this.remove);
     },
     render: function() {
-      this.$el.html(this.template(this.model.toJSON()));
+      this.$el.html(this.template(this.model.toObject()));
       this.$el.toggleClass("green", this.model.get('ok'));
       this.$el.addClass("redgreen-entry");
       return this;
-    },
-    debugRemove: function() {
-        console.log("debugRemove", this, arguments);
     }
   });
 
@@ -48,6 +52,9 @@ $(function() {
     addOne: function(entry) {
       var view = new EntryView({model: entry});
       this.$el.append(view.render().el);
+    },
+    addAll: function() {
+        Entries.each(this.addOne, this);
     }
   });
 

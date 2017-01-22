@@ -46,10 +46,11 @@ func main() {
 			Flags:   serverFlags,
 		},
 		{
-			Name:    "run",
-			Aliases: []string{"r", "x"},
-			Usage:   "run a shell command",
-			Action:  doRun,
+			Name:           "run",
+			Aliases:        []string{"r", "x"},
+			Usage:          "run a shell command",
+			Action:         doRun,
+			SkipArgReorder: true, // so we don't parse command flags
 			Flags: append([]cli.Flag{cli.BoolFlag{
 				Name:  "redir",
 				Usage: "tee STDERR to STDOUT",
