@@ -1,0 +1,8 @@
+[Unit]
+Description=RedGreen
+
+[Service]
+ExecStart=/usr/local/bin/redgreen serve
+
+[Install]
+WantedBy=multi-user.target
