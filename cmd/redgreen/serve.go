@@ -7,20 +7,15 @@ import (
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/jncornett/redgreen"
+	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
 )
 
 func doServe(c *cli.Context) error {
 	store := redgreen.NewStore()
-	defer store.Close()
-	http.Handle(
-		apiEndpoint,
-		http.StripPrefix(apiEndpoint, logger(redgreen.NewHTTPJSONServer(store))),
-	)
-	http.Handle(
-		apiEndpoint+"/",
-		http.StripPrefix(apiEndpoint+"/", logger(redgreen.NewHTTPJSONServer(store))),
-	)
+	handler := http.StripPrefix(apiEndpoint, logger(restful.NewJSONHandler(store)))
+	http.Handle(apiEndpoint, handler)
+	http.Handle(apiEndpoint+"/", handler)
 	http.Handle("/", http.FileServer(&assetfs.AssetFS{
 		Asset:     Asset,
 		AssetDir:  AssetDir,

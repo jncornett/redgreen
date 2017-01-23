@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/jncornett/redgreen"
+	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
 )
 
@@ -58,11 +59,14 @@ func main() {
 		},
 		{
 			Name:     "put",
-			Aliases:  []string{"pu"},
+			Aliases:  []string{"p"},
 			Usage:    "insert an entry",
 			Action:   doPut,
 			Category: "op",
-			Flags:    clientFlags,
+			Flags: append([]cli.Flag{cli.BoolFlag{
+				Name:  "stdin",
+				Usage: "read data from STDIN",
+			}}, clientFlags...),
 		},
 		{
 			Name:     "get",
@@ -73,10 +77,10 @@ func main() {
 			Flags:    clientFlags,
 		},
 		{
-			Name:     "pop",
-			Aliases:  []string{"po"},
+			Name:     "delete",
+			Aliases:  []string{"d", "del"},
 			Usage:    "lookup and delete an entry",
-			Action:   doPop,
+			Action:   doDelete,
 			Category: "op",
 			Flags:    clientFlags,
 		},
@@ -92,8 +96,12 @@ func main() {
 	app.Run(os.Args)
 }
 
-func getClient(addr string) redgreen.HTTPJSONClient {
-	return redgreen.HTTPJSONClient("http://" + addr + apiEndpoint)
+func getClient(addr string) restful.ClientStore {
+	return restful.NewJSONClient(
+		"http://"+addr+apiEndpoint,
+		func() interface{} { return &redgreen.Entry{} },
+		func() interface{} { return &[]redgreen.Entry{} },
+	)
 }
 
 func printEntries(entries []redgreen.Entry) error {
