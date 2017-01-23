@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/jncornett/redgreen"
+	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
 )
 
@@ -22,8 +23,8 @@ func doRun(c *cli.Context) error {
 	cmdArgs := args[2:]
 	lines, ok, cmdErr := execCommand(cmdName, cmdArgs, c.Bool("redir"))
 	client := getClient(c.String("addr"))
-	clientErr := client.Put(redgreen.Entry{
-		Key:  key,
+	_, clientErr := client.Put(redgreen.Entry{
+		ID:   restful.ID(key),
 		OK:   ok,
 		Data: lines,
 	})

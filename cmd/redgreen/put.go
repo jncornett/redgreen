@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/jncornett/redgreen"
+	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
 )
 
@@ -22,15 +23,18 @@ func doPut(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	lines, err := readAllLines(os.Stdin)
-	if err != nil {
-		return err
+	var lines []string
+	if c.Bool("stdin") {
+		lines, err = readAllLines(os.Stdin)
+		if err != nil {
+			return err
+		}
 	}
 	client := getClient(c.String("addr"))
-	// TODO add strings from STDIN
-	return client.Put(redgreen.Entry{
-		Key:  key,
+	_, err = client.Put(redgreen.Entry{
+		ID:   restful.ID(key),
 		OK:   ok,
 		Data: lines,
 	})
+	return err
 }

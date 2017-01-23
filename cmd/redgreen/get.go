@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jncornett/redgreen"
+	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
 )
 
@@ -13,12 +14,9 @@ func doGet(c *cli.Context) error {
 	}
 	key := c.Args()[0]
 	client := getClient(c.String("addr"))
-	entry, ok, err := client.Get(key)
+	v, err := client.Get(restful.ID(key))
 	if err != nil {
 		return err
 	}
-	if !ok {
-		return fmt.Errorf("key not found")
-	}
-	return printEntries([]redgreen.Entry{entry})
+	return printEntries([]redgreen.Entry{*v.(*redgreen.Entry)})
 }
