@@ -18,7 +18,6 @@ The web client is located at `http://localhost:8080` by default.
 
 ## todo
 - add motivation
-- add quickstart
 - add overlayfs for customization
 - add error parsing plugins
 - add (better) server logging and verbosity switches
