@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	assetfs "github.com/elazarl/go-bindata-assetfs"
 	"github.com/jncornett/redgreen"
 	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
@@ -17,12 +16,7 @@ func doMock(c *cli.Context) error {
 	handler := http.StripPrefix(apiEndpoint, logger(restful.NewJSONHandler(store)))
 	http.Handle(apiEndpoint, handler)
 	http.Handle(apiEndpoint+"/", handler)
-	http.Handle("/", http.FileServer(&assetfs.AssetFS{
-		Asset:     Asset,
-		AssetDir:  AssetDir,
-		AssetInfo: AssetInfo,
-		Prefix:    "data/static",
-	}))
+	http.Handle("/", http.FileServer(http.Dir(c.Args()[0])))
 	go randomMockUpdates(store)
 	return http.ListenAndServe(defaultListenAddr, nil)
 }
