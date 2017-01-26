@@ -2,7 +2,7 @@
 Description=RedGreen
 
 [Service]
-ExecStart=/usr/local/bin/redgreen serve
+ExecStart=/usr/local/bin/redgreen serve --static /var/www/redgreen
 
 [Install]
 WantedBy=multi-user.target
