@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	assetfs "github.com/elazarl/go-bindata-assetfs"
+	"github.com/jncornett/overlayfs"
 	"github.com/jncornett/redgreen"
 	"github.com/jncornett/restful"
 	"github.com/urfave/cli"
@@ -16,13 +17,25 @@ func doServe(c *cli.Context) error {
 	handler := http.StripPrefix(apiEndpoint, logger(restful.NewJSONHandler(store)))
 	http.Handle(apiEndpoint, handler)
 	http.Handle(apiEndpoint+"/", handler)
-	http.Handle("/", http.FileServer(&assetfs.AssetFS{
+	http.Handle("/", http.FileServer(getFs(c)))
+	return http.ListenAndServe(c.String("addr"), nil)
+}
+
+func getFs(c *cli.Context) http.FileSystem {
+	assetFs := &assetfs.AssetFS{
 		Asset:     Asset,
 		AssetDir:  AssetDir,
 		AssetInfo: AssetInfo,
 		Prefix:    "data/static",
-	}))
-	return http.ListenAndServe(c.String("addr"), nil)
+	}
+	overlay := c.String("static")
+	if overlay == "" {
+		return assetFs
+	}
+	return overlayfs.NewOverlayFs(
+		http.Dir(overlay),
+		assetFs,
+	)
 }
 
 func logger(h http.Handler) http.HandlerFunc {

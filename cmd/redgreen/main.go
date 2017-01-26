@@ -26,6 +26,11 @@ var (
 			Value: defaultListenAddr,
 			Usage: "address to listen to",
 		},
+		cli.StringFlag{
+			Name:  "static",
+			Value: "",
+			Usage: "use `DIR` as an overlay for serving the static fs",
+		},
 	}
 	clientFlags = []cli.Flag{
 		cli.StringFlag{
@@ -39,11 +44,6 @@ var (
 func main() {
 	app := cli.NewApp()
 	app.Commands = []cli.Command{
-		{
-			Name:   "mock",
-			Usage:  "mock the server for web dev",
-			Action: doMock,
-		},
 		{
 			Name:    "serve",
 			Aliases: []string{"s"},

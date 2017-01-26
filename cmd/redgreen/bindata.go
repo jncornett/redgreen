@@ -90,7 +90,7 @@ func dataStaticIndexHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/index.html", size: 1123, mode: os.FileMode(420), modTime: time.Unix(1485379636, 0)}
+	info := bindataFileInfo{name: "data/static/index.html", size: 1123, mode: os.FileMode(436), modTime: time.Unix(1485458565, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func dataStaticMainJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/main.js", size: 1638, mode: os.FileMode(420), modTime: time.Unix(1485043428, 0)}
+	info := bindataFileInfo{name: "data/static/main.js", size: 1638, mode: os.FileMode(436), modTime: time.Unix(1485458562, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func dataStaticStyleCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/style.css", size: 550, mode: os.FileMode(420), modTime: time.Unix(1485041906, 0)}
+	info := bindataFileInfo{name: "data/static/style.css", size: 550, mode: os.FileMode(436), modTime: time.Unix(1485459593, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func dataStaticThirdpartyBackboneMinJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/thirdparty/backbone-min.js", size: 23355, mode: os.FileMode(420), modTime: time.Unix(1485016468, 0)}
+	info := bindataFileInfo{name: "data/static/thirdparty/backbone-min.js", size: 23355, mode: os.FileMode(436), modTime: time.Unix(1484928348, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func dataStaticThirdpartyBasscssMinCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/thirdparty/basscss.min.css", size: 9848, mode: os.FileMode(420), modTime: time.Unix(1485379588, 0)}
+	info := bindataFileInfo{name: "data/static/thirdparty/basscss.min.css", size: 9848, mode: os.FileMode(436), modTime: time.Unix(1485458565, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func dataStaticThirdpartyJquery311MinJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/thirdparty/jquery-3.1.1.min.js", size: 86709, mode: os.FileMode(420), modTime: time.Unix(1485016468, 0)}
+	info := bindataFileInfo{name: "data/static/thirdparty/jquery-3.1.1.min.js", size: 86709, mode: os.FileMode(436), modTime: time.Unix(1484928282, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func dataStaticThirdpartyMomentMinJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/thirdparty/moment.min.js", size: 61317, mode: os.FileMode(420), modTime: time.Unix(1485042826, 0)}
+	info := bindataFileInfo{name: "data/static/thirdparty/moment.min.js", size: 61317, mode: os.FileMode(436), modTime: time.Unix(1485182307, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -230,7 +230,7 @@ func dataStaticThirdpartyUnderscoreMinJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/static/thirdparty/underscore-min.js", size: 16449, mode: os.FileMode(420), modTime: time.Unix(1485016468, 0)}
+	info := bindataFileInfo{name: "data/static/thirdparty/underscore-min.js", size: 16449, mode: os.FileMode(436), modTime: time.Unix(1484928314, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
