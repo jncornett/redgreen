@@ -40,6 +40,11 @@ func main() {
 	app := cli.NewApp()
 	app.Commands = []cli.Command{
 		{
+			Name:   "mock",
+			Usage:  "mock the server for web dev",
+			Action: doMock,
+		},
+		{
 			Name:    "serve",
 			Aliases: []string{"s"},
 			Usage:   "start a server",
